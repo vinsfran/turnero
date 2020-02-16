@@ -1,69 +1,89 @@
 package py.gov.asuncion.turnero.all.vistas;
 
-import javax.swing.JOptionPane;
-import java.util.Date;
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-import py.gov.asuncion.turnero.all.data.dto.Abecedario;
-import py.gov.asuncion.turnero.all.data.dto.Dependencia;
-import py.gov.asuncion.turnero.all.data.dto.Orden;
-import py.gov.asuncion.turnero.all.data.dto.OrdenHistorico;
-import py.gov.asuncion.turnero.all.data.dto.Param;
-import py.gov.asuncion.turnero.all.data.jdbcRepository.AbecedarioJdbcRepository;
-import py.gov.asuncion.turnero.all.data.jdbcRepository.DependenciaJdbcRepository;
-import py.gov.asuncion.turnero.all.data.jdbcRepository.OrdenHistoricoJdbcRepository;
-import py.gov.asuncion.turnero.all.data.jdbcRepository.OrdenJdbcRepository;
-import py.gov.asuncion.turnero.all.data.jdbcRepository.ParamJdbcRepository;
-import py.gov.asuncion.turnero.all.model.TicketModel;
+import py.gov.asuncion.turnero.all.controller.TicketController;
 import py.gov.asuncion.turnero.all.util.ConstantUtil;
-import py.gov.asuncion.turnero.all.util.DateUtil;
-import py.gov.asuncion.turnero.all.util.PrinterUtil;
-import py.gov.asuncion.turnero.all.util.TicketPrintable;
-import static py.gov.asuncion.turnero.all.vistas.Monitor.GRUPO_PATH;
+
+import javax.swing.*;
+import java.util.List;
 
 /**
  * * @author cbaez
  */
 public final class Ticket extends javax.swing.JFrame {
 
-    public final static String GRUPO_ABCD = "ABCD";
-
-    private Dependencia dependencia;
-    private Orden orden;
-    private TicketModel ticketModel;
-
-    private Integer vIddep = 0;
-    private String abreviaturaDependencia;
-    private String vTPendiente;
-    private String nombreImpresora;
+    private TicketController ticketController;
+    private String impresoraSeleccionada;
+    private List<String> impresoras;
 
     /**
      * * Creates new form cliente
      */
     public Ticket() {
-        OrdenJdbcRepository ordenJdbcRepository = new OrdenJdbcRepository();
-        Orden orden2 = ordenJdbcRepository.getOneOrdenFecha();
-        if (orden2 != null) {
-            System.out.println(orden2.toString());
-            Date dateNow = new Date();
-            if (!DateUtil.compararFechas(dateNow, orden2.getFecha())) {
-                //SE INICIALIZA LA TABLA ORDEN 
-                if (!ordenJdbcRepository.deleteAll()) {
-                    JOptionPane.showMessageDialog(null, "Hubo problemas al borrar la tabla Orden", "Atención",
-                            JOptionPane.INFORMATION_MESSAGE);
+        ticketController = new TicketController();
+        if (ticketController.borrarTablaOrden()) {
+            this.impresoras = ticketController.getImpresoras();
+            if (this.impresoras.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No se encontraron impresoras", "Atención",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                initComponents();
+                for (String impresora : this.impresoras) {
+                    this.comboImpresoras.addItem(impresora);
                 }
-            }
-            initComponents();
-            PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null); //Obtenemos los servicios de impresion del sistema 
-            for (PrintService impresora : printServices) { //Recorremos el array de servicios de impresion
-                this.comboImpresoras.addItem(impresora.getName());
+                TextPendFacturacion.setText(ticketController.getTotalPendientesByIdDependencia(ConstantUtil.ID_FACTURACION));
+                TextPendGestion.setText(ticketController.getTotalPendientesByIdDependencia(ConstantUtil.ID_GESTION_TRIBUTARIA));
+                TextPendPatentes.setText(ticketController.getTotalPendientesByIdDependencia(ConstantUtil.ID_PATENTES));
+                TextPendGrandes.setText(ticketController.getTotalPendientesByIdDependencia(ConstantUtil.ID_GRANDES_CONTRIBUYENTES));
+                TextPendInmuebles.setText(ticketController.getTotalPendientesByIdDependencia(ConstantUtil.ID_ATENCION_AL_CONTRIBUYUNTES));
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Hubo problemas para conectar con la base de datos", "Atención",
+            JOptionPane.showMessageDialog(null, "Hubo problemas al borrar la tabla Orden", "Atención",
                     JOptionPane.INFORMATION_MESSAGE);
         }
-
     }
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        //FACTURACION
+        TextUltimoImpreso.setText(generaNumero(ConstantUtil.ID_FACTURACION));
+        TextPendFacturacion.setText(ticketController.getTotalPendientesByIdDependencia(ConstantUtil.ID_FACTURACION));
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        //GESTION_TRIBUTARIA
+        TextUltimoImpreso.setText(generaNumero(ConstantUtil.ID_GESTION_TRIBUTARIA));
+        TextPendGestion.setText(ticketController.getTotalPendientesByIdDependencia(ConstantUtil.ID_GESTION_TRIBUTARIA));
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        //PATENTES
+        TextUltimoImpreso.setText(generaNumero(ConstantUtil.ID_PATENTES));
+        TextPendPatentes.setText(ticketController.getTotalPendientesByIdDependencia(ConstantUtil.ID_PATENTES));
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        //GRANDES_CONTRIBUYENTES
+        TextUltimoImpreso.setText(generaNumero(ConstantUtil.ID_GRANDES_CONTRIBUYENTES));
+        TextPendGrandes.setText(ticketController.getTotalPendientesByIdDependencia(ConstantUtil.ID_GRANDES_CONTRIBUYENTES));
+
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+        //ATENCION_AL_CONTRIBUYUNTES
+        TextUltimoImpreso.setText(generaNumero(ConstantUtil.ID_ATENCION_AL_CONTRIBUYUNTES));
+        TextPendInmuebles.setText(ticketController.getTotalPendientesByIdDependencia(ConstantUtil.ID_ATENCION_AL_CONTRIBUYUNTES));
+    }//GEN-LAST:event_jButton10ActionPerformed
+
+    public String generaNumero(Integer idDependencia) {
+        try {
+            return ticketController.generarTicket(idDependencia, impresoraSeleccionada);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Atención",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+        return "";
+    }
+
 
     /**
      * * This method is called from within the constructor to initialize the
@@ -252,281 +272,130 @@ public final class Ticket extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel2)
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(54, 54, 54)
-                                .addComponent(jLabel4))
-                            .addComponent(jLabel6)))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                            .addGap(79, 79, 79)
-                            .addComponent(jLabel12)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel11))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(91, 91, 91)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(TextPendGrandes)
-                                .addComponent(TextPendPatentes)
-                                .addComponent(TextPendFacturacion)
-                                .addComponent(TextPendInmuebles)
-                                .addComponent(TextPendGestion, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addComponent(TextUltimoImpreso, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel15)
-                                .addGap(473, 473, 473))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(260, 260, 260))))))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(comboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(jLabel2)
+                                                .addGap(18, 18, 18)
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                .addGap(54, 54, 54)
+                                                                .addComponent(jLabel4))
+                                                        .addComponent(jLabel6)))
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                                        .addGap(79, 79, 79)
+                                                        .addComponent(jLabel12)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(jLabel11))
+                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                                        .addContainerGap()
+                                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGap(91, 91, 91)
+                                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                .addComponent(TextPendGrandes)
+                                                                .addComponent(TextPendPatentes)
+                                                                .addComponent(TextPendFacturacion)
+                                                                .addComponent(TextPendInmuebles)
+                                                                .addComponent(TextPendGestion, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addGap(36, 36, 36)
+                                                .addComponent(TextUltimoImpreso, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                                .addComponent(jLabel15)
+                                                                .addGap(473, 473, 473))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(260, 260, 260))))))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(comboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(50, 50, 50)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel8))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel2)))
-                .addGap(18, 18, 18)
-                .addComponent(comboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel12)
-                            .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(TextPendGestion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                            .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TextPendFacturacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel15)
-                        .addGap(18, 18, 18)
-                        .addComponent(TextUltimoImpreso, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(TextPendPatentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(TextPendGrandes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(TextPendInmuebles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 36, Short.MAX_VALUE))
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addGap(50, 50, 50)
+                                                .addComponent(jLabel6)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jLabel4)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jLabel8))
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(jLabel2)))
+                                .addGap(18, 18, 18)
+                                .addComponent(comboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(10, 10, 10)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel12)
+                                                        .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.TRAILING))
+                                                .addGap(18, 18, 18)
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(TextPendGestion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(TextPendFacturacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel15)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(TextUltimoImpreso, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(TextPendPatentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                        .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(TextPendGrandes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                                        .addComponent(TextPendInmuebles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 36, Short.MAX_VALUE))
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {TextPendFacturacion, TextPendGestion, TextPendGrandes, TextPendPatentes});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{TextPendFacturacion, TextPendGestion, TextPendGrandes, TextPendPatentes});
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1004, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1004, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(41, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap(41, Short.MAX_VALUE)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    public void generaNumero() {
-        //Obtiene la descripcion de la Dependencia para el ticket
-        if (obtenerDependencia()) {
-            if (obtenerSiguienteOrdenByDependenciaId(dependencia.getIddependencia())) {
-                armarTicket();
-                if (!imprimirTicket()) {
-                    JOptionPane.showMessageDialog(null, "Hubo problemas con la Impresión del Ticket", "Atención",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Hubo problemas con la seleccion del Contador", "Atención",
-                        JOptionPane.INFORMATION_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Hubo problemas con la seleccion de Dependencias", "Atención",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    private boolean obtenerDependencia() {
-        DependenciaJdbcRepository dependenciaJdbcRepository = new DependenciaJdbcRepository();
-        dependencia = dependenciaJdbcRepository.getDependenciaById(vIddep);
-        if (dependencia == null) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean obtenerSiguienteOrdenByDependenciaId(Integer idDependencia) {
-        OrdenJdbcRepository ordenJdbcRepository = new OrdenJdbcRepository();
-        Integer nroOrdenActual = ordenJdbcRepository.getMaxIdordenByDependenciaId(dependencia.getIddependencia());
-        orden = ordenJdbcRepository.getByIdOrden(nroOrdenActual);
-        if (orden == null) {
-            orden = new Orden();
-            orden.setNOrden(0);
-            orden.setNLetra(1);
-            orden.setAbec("A");
-        }
-
-        orden.setNOrden(orden.getNOrden() + 1);
-
-        if (orden.getNOrden() > 100) {
-            ParamJdbcRepository paramJdbcRepository = new ParamJdbcRepository();
-            Param param = paramJdbcRepository.getParamByGrupoAndCodigo(GRUPO_ABCD, "MAXLETRAS");
-            if (param != null) {
-                System.out.println("VALOR: " + param.getValor());
-                Integer maxLetrasLlamar = Integer.valueOf(param.getValor());
-                //Buscar letra actual (n_letra + 1)
-                AbecedarioJdbcRepository abecedarioJdbcRepository = new AbecedarioJdbcRepository();
-                Integer idLetra = orden.getNLetra() + 1;
-                if (idLetra > maxLetrasLlamar) {
-                    idLetra = 1;
-                }
-                Abecedario abecedario = abecedarioJdbcRepository.getAbecedarioByIdAbecedario(idLetra);
-                orden.setNOrden(1);
-                orden.setNLetra(abecedario.getIdabc());
-                orden.setAbec(abecedario.getLetra());
-            } else {
-                JOptionPane.showMessageDialog(null, "Hubo problemas para obtener parametro MaxLetras", "Atención",
-                        JOptionPane.INFORMATION_MESSAGE);
-                return false;
-            }
-
-        }
-
-        orden.setIdOrden(ordenJdbcRepository.getMaxIdorden() + 1);
-        orden.setClienteIdCliente(0);
-        orden.setIdDependencia(dependencia.getIddependencia());
-        orden.setEstado("P");
-        orden.setFecha(new Date());
-        orden.setAbreDependencia(abreviaturaDependencia);
-        if (!ordenJdbcRepository.insertOrden(orden)) {
-            JOptionPane.showMessageDialog(null, "Hubo al insertar el siguiente Turno", "Atención NO IMPRIMA MAS NUMEROS LLAME AL TECNICO CEL. 0961-376440",
-                    JOptionPane.INFORMATION_MESSAGE);
-            return false;
-        }
-        return true;
-    }
-
-    private void armarTicket() {
-        ticketModel = new TicketModel();
-        ticketModel.setDependenciaNombre(dependencia.getDescripcion());
-        ticketModel.setLetra(orden.getAbreDependencia() + orden.getAbec());
-        ticketModel.setNumero(orden.getNOrden());
-    }
-
-    private boolean imprimirTicket() {
-        System.out.println("Ticket: " + ticketModel.toString());
-//        TicketPrintable ticketPrintable = new TicketPrintable(ticketModel);
-//        if (PrinterUtil.print(ticketPrintable, nombreImpresora)) {
-//            OrdenHistorico ordenHistorico = new OrdenHistorico();
-//            ordenHistorico.setClienteIdCliente(0);
-//            ordenHistorico.setNOrden(ticketModel.getNumero());
-//            ordenHistorico.setAbec(ticketModel.getLetra());
-//            ordenHistorico.setIdDependencia(dependencia.getIddependencia());
-//            ordenHistorico.setFecha(new Date());
-//            OrdenHistoricoJdbcRepository ordenHistoricoJdbcRepository = new OrdenHistoricoJdbcRepository();
-//            if (!ordenHistoricoJdbcRepository.insertOrdenHistorico(ordenHistorico)) {
-//                JOptionPane.showMessageDialog(null, "Hubo al insertar el siguiente Turno Historico", "Atención NO IMPRIMA MAS NUMEROS LLAME AL TECNICO CEL. 0961-376440",
-//                        JOptionPane.INFORMATION_MESSAGE);
-//                return false;
-//            }
-//        } else {
-//            JOptionPane.showMessageDialog(null, "Hubo al imprimir el Ticket", "Atención NO IMPRIMA MAS NUMEROS LLAME AL TECNICO CEL. 0961-376440",
-//                    JOptionPane.INFORMATION_MESSAGE);
-//            return false;
-//        }
-        return true;
-    }
-
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        //facturacion
-        abreviaturaDependencia = ConstantUtil.FACTURACION;
-        vIddep = 2;
-        generaNumero();
-        TextPendFacturacion.setText(vTPendiente);
-    }//GEN-LAST:event_jButton5ActionPerformed
-
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        //patentes
-        abreviaturaDependencia = ConstantUtil.PATENTES;
-        vIddep = 4;
-        generaNumero();
-        TextPendPatentes.setText(vTPendiente);
-    }//GEN-LAST:event_jButton7ActionPerformed
-
-    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        //gestion
-        abreviaturaDependencia = ConstantUtil.GESTION_TRIBUTARIA;
-        vIddep = 3;
-        generaNumero();
-        TextPendGestion.setText(vTPendiente);
-    }//GEN-LAST:event_jButton8ActionPerformed
-
-    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        //GRANDES
-        abreviaturaDependencia = ConstantUtil.GRANDES_CONTRIBUYENTES;
-        vIddep = 5;
-        generaNumero();
-        TextPendGrandes.setText(vTPendiente);
-    }//GEN-LAST:event_jButton9ActionPerformed
-
-    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        //ATENCION
-        abreviaturaDependencia = ConstantUtil.ATENCION_AL_CONTRIBUYUNTES;
-        vIddep = 7;
-        generaNumero();
-        TextPendInmuebles.setText(vTPendiente);
-    }//GEN-LAST:event_jButton10ActionPerformed
 
     private void TextUltimoImpresoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TextUltimoImpresoActionPerformed
         // TODO add your handling code here:
@@ -557,7 +426,7 @@ public final class Ticket extends javax.swing.JFrame {
     }//GEN-LAST:event_comboImpresorasMouseClicked
 
     private void comboImpresorasItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboImpresorasItemStateChanged
-        nombreImpresora = this.comboImpresoras.getSelectedItem().toString();
+        impresoraSeleccionada = this.comboImpresoras.getSelectedItem().toString();
     }//GEN-LAST:event_comboImpresorasItemStateChanged
 
     /**
@@ -567,7 +436,7 @@ public final class Ticket extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {

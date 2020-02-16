@@ -1,7 +1,6 @@
 package py.gov.asuncion.turnero.all.util;
 
 /**
- *
  * @author vinsfran
  */
 public interface ConstantUtil {
@@ -17,11 +16,13 @@ public interface ConstantUtil {
     String CODIGO_PATHSONIDOLINUX = "PATHSONIDOLINUX";
     String CODIGO_PATHSONIDOWIN = "PATHSONIDOWIN";
     String DATE_FORMAT_YYYY_MM_DD = "yyyy-MM-dd";
-    
-    String FACTURACION = "FA";
-    String GESTION_TRIBUTARIA = "GE";
-    String GRANDES_CONTRIBUYENTES = "GC";
-    String PATENTES = "PA";
-    String INMUEBLES = "IN";
-    String ATENCION_AL_CONTRIBUYUNTES = "AC";
+    String GRUPO_ABCD = "ABCD";
+
+    Integer ID_CAJA = 1;
+    Integer ID_FACTURACION = 2;
+    Integer ID_GESTION_TRIBUTARIA = 3;
+    Integer ID_PATENTES = 4;
+    Integer ID_GRANDES_CONTRIBUYENTES = 5;
+    Integer ID_UNIDAD_DE_INMUEBLES = 6;
+    Integer ID_ATENCION_AL_CONTRIBUYUNTES = 7;
 }

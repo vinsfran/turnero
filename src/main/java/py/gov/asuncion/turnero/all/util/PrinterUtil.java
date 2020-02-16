@@ -40,7 +40,7 @@ public class PrinterUtil {
             job.print();
             return true;
         } catch (PrinterException e) {
-            e.printStackTrace();
+            System.out.println("PrinterUtil:print:ERROR: " + e.getMessage());
         }
         return false;
     }

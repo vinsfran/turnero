@@ -1,13 +1,13 @@
 package py.gov.asuncion.turnero.all.data.jdbcRepository;
 
-import java.sql.Statement;
 import py.gov.asuncion.turnero.all.conexion.Conexion;
 import py.gov.asuncion.turnero.all.data.dto.OrdenHistorico;
 import py.gov.asuncion.turnero.all.util.ConstantUtil;
 import py.gov.asuncion.turnero.all.util.DateUtil;
 
+import java.sql.Statement;
+
 /**
- *
  * @author vinsfran
  */
 public class OrdenHistoricoJdbcRepository {
@@ -27,7 +27,7 @@ public class OrdenHistoricoJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("OrdenHistoricoJdbcRepository:insertOrdenHistorico:ERROR: " + e.getMessage());
             return false;
         }
         return true;

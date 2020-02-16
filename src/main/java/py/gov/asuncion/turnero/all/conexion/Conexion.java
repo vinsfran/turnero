@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.sql.*;
 import java.sql.Connection;
 import java.util.Properties;
+
 import py.gov.asuncion.turnero.all.util.ConstantUtil;
 
 /**
@@ -38,10 +39,10 @@ public class Conexion {
                 Class.forName(ConstantUtil.DRIVER_JDBC);
                 con = DriverManager.getConnection(urlJdbc, userDb, passworDb);
             } else {
-                System.out.println("Archivo NO existe");
+                System.out.println("Conexion:getConnection:ERROR: No existe Archivo");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Conexion:getConnection:ERROR: " + e.getMessage());
         }
         return con;
     }
