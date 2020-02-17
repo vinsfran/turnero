@@ -3,13 +3,18 @@ package py.gov.asuncion.turnero.all.util;
 /**
  * * @author vinsfran
  */
+
 import java.io.File;
 import java.io.IOException;
 import javax.sound.sampled.AudioFormat;
+
 import static javax.sound.sampled.AudioFormat.Encoding.PCM_SIGNED;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+
 import static javax.sound.sampled.AudioSystem.getAudioInputStream;
+
 import javax.sound.sampled.DataLine.Info;
 import javax.sound.sampled.SourceDataLine;
 
@@ -18,7 +23,7 @@ public class ReproductorUtil {
     public ReproductorUtil() {
     }
 
-    public void play(final String fileName) throws Exception {
+    public void play(final String fileName) {
         final File file = new File(fileName);
         try (final AudioInputStream in = getAudioInputStream(file)) {
             final AudioFormat outFormat = getOutFormat(in.getFormat());
@@ -33,7 +38,7 @@ public class ReproductorUtil {
                 }
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ReproductorUtil:play:ERROR: " + e.getMessage());
         }
     }
 

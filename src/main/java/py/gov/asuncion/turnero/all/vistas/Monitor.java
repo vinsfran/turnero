@@ -19,8 +19,6 @@ import py.gov.asuncion.turnero.all.util.ConstantUtil;
 
 public class Monitor extends javax.swing.JFrame implements Runnable {
 
-    public final static String GRUPO_PATH = "PATH";
-
     Integer cont, pos = 0;
 
     private String pathSonido;
@@ -34,7 +32,7 @@ public class Monitor extends javax.swing.JFrame implements Runnable {
             paramCodigo = ConstantUtil.CODIGO_PATHSONIDOWIN;
         }
         ParamJdbcRepository paramJdbcRepository = new ParamJdbcRepository();
-        Param param = paramJdbcRepository.getParamByGrupoAndCodigo(GRUPO_PATH, paramCodigo);
+        Param param = paramJdbcRepository.getParamByGrupoAndCodigo(ConstantUtil.GRUPO_PATH, paramCodigo);
         if (param != null) {
             pathSonido = param.getValor();
             initComponents();

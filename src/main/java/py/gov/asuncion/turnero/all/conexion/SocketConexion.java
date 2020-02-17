@@ -1,14 +1,14 @@
 package py.gov.asuncion.turnero.all.conexion;
 
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.util.List;
 import py.gov.asuncion.turnero.all.data.dto.Monitor;
 import py.gov.asuncion.turnero.all.data.jdbcRepository.MonitorJdbcRepository;
 import py.gov.asuncion.turnero.all.model.SocketDataSendModel;
 
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.util.List;
+
 /**
- *
  * @author cbaez02
  */
 public class SocketConexion {
@@ -25,11 +25,11 @@ public class SocketConexion {
                     paqueteDatos.writeObject(socketDataSendModel);
                     socket.close();
                 } catch (Exception e) {
-                    System.out.println("Error al enviar por socket: " + e.getMessage());
+                    System.out.println("SocketConexion:send:ERROR: " + e.getMessage());
                 }
             }
         } else {
-            System.out.println("No existen Monitores registrados en la BD");
+            System.out.println("SocketConexion:send:ERROR: No existen Monitores registrados en la BD");
         }
 
     }

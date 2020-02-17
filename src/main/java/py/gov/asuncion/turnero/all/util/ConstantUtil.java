@@ -17,6 +17,7 @@ public interface ConstantUtil {
     String CODIGO_PATHSONIDOWIN = "PATHSONIDOWIN";
     String DATE_FORMAT_YYYY_MM_DD = "yyyy-MM-dd";
     String GRUPO_ABCD = "ABCD";
+    String GRUPO_PATH = "PATH";
 
     Integer ID_CAJA = 1;
     Integer ID_FACTURACION = 2;
