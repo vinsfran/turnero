@@ -5,24 +5,23 @@ import py.gov.asuncion.turnero.all.data.jdbcRepository.ParamJdbcRepository;
 import py.gov.asuncion.turnero.all.model.SocketDataSendModel;
 import py.gov.asuncion.turnero.all.util.ConstantUtil;
 import py.gov.asuncion.turnero.all.util.ReproductorUtil;
-import py.gov.asuncion.turnero.all.vistas.Monitor;
-import py.gov.asuncion.turnero.all.vistas.MonitorView;
+import py.gov.asuncion.turnero.all.view.MonitorView;
 
-import javax.swing.*;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import py.gov.asuncion.turnero.all.data.jdbcRepository.LogJdbcRepository;
 
-public class MonitorPresenter {
+public class MonitorPresenter extends LogJdbcRepository {
 
     private ParamJdbcRepository paramJdbcRepository;
     private MonitorView monitorView;
     private Param param;
+    private String nombreClase;
 
     public MonitorPresenter(MonitorView monitorView) {
+        this.nombreClase = MonitorPresenter.class.getName();
         String paramCodigo = ConstantUtil.CODIGO_PATHSONIDOLINUX;
         String sSistemaOperativo = System.getProperty("os.name");
         System.out.println(sSistemaOperativo);
@@ -32,7 +31,6 @@ public class MonitorPresenter {
         this.monitorView = monitorView;
         this.paramJdbcRepository = new ParamJdbcRepository();
         this.param = paramJdbcRepository.getParamByGrupoAndCodigo(ConstantUtil.GRUPO_PATH, paramCodigo);
-
     }
 
     public void ejecutarConexion() {
@@ -64,14 +62,18 @@ public class MonitorPresenter {
                 monitorView.updatePantalla(paqueteRecibido);
                 reproducirAudio(paqueteRecibido);
             }
-        } catch (Exception ex) {
-            Logger.getLogger(Monitor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            String mensaje = this.nombreClase + ":runServer: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         } finally {
             try {
                 socket.close();
                 server.close();
-            } catch (Exception ex) {
-                Logger.getLogger(Monitor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception e) {
+                String mensaje = this.nombreClase + ":runServer: " + e.getMessage();
+                insertLog(mensaje);
+                System.out.println(mensaje);
             }
         }
     }
@@ -89,9 +91,10 @@ public class MonitorPresenter {
             reproductor.play(param.getValor() + "box.wav");
             reproductor.play(param.getValor() + "numeros/" + paqueteRecibido.getNombreArchivoNroTerminal());
         } else {
-            System.out.println("MonitorPresenter:reproducirAudio:ERROR: param NULL");
+            String mensaje = this.nombreClase + ":reproducirAudio: param NULL";
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
-
 
     }
 }

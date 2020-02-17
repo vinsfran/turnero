@@ -7,11 +7,18 @@ import py.gov.asuncion.turnero.all.model.SocketDataSendModel;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
+import py.gov.asuncion.turnero.all.data.jdbcRepository.LogJdbcRepository;
 
 /**
  * @author cbaez02
  */
-public class SocketConexion {
+public class SocketConexion extends LogJdbcRepository {
+
+    private String nombreClase;
+
+    public SocketConexion() {
+        this.nombreClase = SocketConexion.class.getName();
+    }
 
     public void send(SocketDataSendModel socketDataSendModel) {
         MonitorJdbcRepository monitorJdbcRepository = new MonitorJdbcRepository();
@@ -25,11 +32,15 @@ public class SocketConexion {
                     paqueteDatos.writeObject(socketDataSendModel);
                     socket.close();
                 } catch (Exception e) {
-                    System.out.println("SocketConexion:send:ERROR: " + e.getMessage());
+                    String mensaje = this.nombreClase + ":send: " + e.getMessage();
+                    insertLog(mensaje);
+                    System.out.println(mensaje);
                 }
             }
         } else {
-            System.out.println("SocketConexion:send:ERROR: No existen Monitores registrados en la BD");
+            String mensaje = this.nombreClase + ":send: No existen Monitores registrados en la BD";
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
 
     }

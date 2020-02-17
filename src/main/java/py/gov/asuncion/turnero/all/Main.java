@@ -1,7 +1,7 @@
 package py.gov.asuncion.turnero.all;
 
 import py.gov.asuncion.turnero.all.presenter.MonitorPresenter;
-import py.gov.asuncion.turnero.all.vistas.MonitorView;
+import py.gov.asuncion.turnero.all.view.MonitorView;
 
 import javax.swing.*;
 

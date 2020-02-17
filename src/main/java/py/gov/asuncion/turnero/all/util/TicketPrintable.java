@@ -33,8 +33,8 @@ public class TicketPrintable implements Printable {
 
             Font Fnumletra = new Font("Arial", Font.BOLD, 24);
             g2.setFont(Fnumletra);
-            g2.drawString(ticketModel.getLetra() + "-" + ticketModel.getNumero(), 30, 70);
-            
+            g2.drawString(ticketModel.getLetra() + ticketModel.getNumero(), 30, 70);
+
             Font Fmens = new Font("Arial", Font.BOLD, 8);
             g2.setFont(Fmens);
             g2.drawString(ticketModel.getDependenciaNombre(), 20, 90);

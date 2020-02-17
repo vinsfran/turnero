@@ -9,7 +9,13 @@ import py.gov.asuncion.turnero.all.conexion.Conexion;
  *
  * @author vinsfran
  */
-public class ParamJdbcRepository {
+public class ParamJdbcRepository extends LogJdbcRepository {
+
+    private String nombreClase;
+
+    public ParamJdbcRepository() {
+        this.nombreClase = ParamJdbcRepository.class.getName();
+    }
 
     public Param getParamByGrupoAndCodigo(String grupo, String codigo) {
         Conexion conexion = new Conexion();
@@ -31,7 +37,9 @@ public class ParamJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            String mensaje = this.nombreClase + ":getParamByGrupoAndCodigo: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return param;
     }

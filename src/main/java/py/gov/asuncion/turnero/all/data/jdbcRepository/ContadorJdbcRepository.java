@@ -9,17 +9,22 @@ import py.gov.asuncion.turnero.all.data.dto.Contador;
  *
  * @author vinsfran
  */
-public class ContadorJdbcRepository {
+public class ContadorJdbcRepository extends LogJdbcRepository {
+
+    private String nombreClase;
+
+    public ContadorJdbcRepository() {
+        this.nombreClase = ContadorJdbcRepository.class.getName();
+    }
 
     public Contador getContadorByIdContador(Integer idContador) {
         Conexion conexion = new Conexion();
         String sql = "SELECT * FROM contador WHERE id_contador= " + idContador;
         System.out.println(sql);
-        ResultSet rs = null;
         Contador contador = null;
         try {
             Statement statement = conexion.getConnection().createStatement();
-            rs = statement.executeQuery(sql);
+            ResultSet rs = statement.executeQuery(sql);
             rs.next();
             contador = new Contador();
             contador.setContador(rs.getInt("contador"));
@@ -32,7 +37,9 @@ public class ContadorJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            String mensaje = this.nombreClase + ":getContadorByIdContador: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return contador;
     }
@@ -52,7 +59,9 @@ public class ContadorJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            String mensaje = this.nombreClase + ":updateContador: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
             return false;
         }
         return true;

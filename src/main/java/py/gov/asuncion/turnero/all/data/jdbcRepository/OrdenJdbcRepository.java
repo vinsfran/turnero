@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import py.gov.asuncion.turnero.all.conexion.Conexion;
-import py.gov.asuncion.turnero.all.data.dto.Monitor;
 import py.gov.asuncion.turnero.all.data.dto.Orden;
 import py.gov.asuncion.turnero.all.util.ConstantUtil;
 import py.gov.asuncion.turnero.all.util.DateUtil;
@@ -14,7 +13,13 @@ import py.gov.asuncion.turnero.all.util.DateUtil;
 /**
  * @author vinsfran
  */
-public class OrdenJdbcRepository {
+public class OrdenJdbcRepository extends LogJdbcRepository {
+
+    private String nombreClase;
+
+    public OrdenJdbcRepository() {
+        this.nombreClase = OrdenJdbcRepository.class.getName();
+    }
 
     public Orden getOneOrden() {
         Conexion conexion = new Conexion();
@@ -40,7 +45,9 @@ public class OrdenJdbcRepository {
             conexion.close();
         } catch (Exception e) {
             orden = null;
-            System.out.println("OrdenJdbcRepository:getOneOrden:ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":getOneOrden: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return orden;
     }
@@ -49,11 +56,10 @@ public class OrdenJdbcRepository {
         Conexion conexion = new Conexion();
         String sql = "SELECT * FROM orden WHERE id_dependencia = " + idDependencia + " ORDER BY idorden desc limit 1";
         System.out.println(sql);
-        ResultSet rs = null;
         Orden orden = null;
         try {
             Statement statement = conexion.getConnection().createStatement();
-            rs = statement.executeQuery(sql);
+            ResultSet rs = statement.executeQuery(sql);
             rs.next();
             orden = new Orden();
             orden.setIdOrden(rs.getInt("idorden"));
@@ -70,7 +76,9 @@ public class OrdenJdbcRepository {
             conexion.close();
         } catch (Exception e) {
             orden = null;
-            System.out.println("ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":getOneOrdenByIdDependencia: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return orden;
     }
@@ -79,11 +87,10 @@ public class OrdenJdbcRepository {
         Conexion conexion = new Conexion();
         String sql = "SELECT * FROM orden WHERE idorden = " + idOrden;
         System.out.println(sql);
-        ResultSet rs = null;
         Orden orden;
         try {
             Statement statement = conexion.getConnection().createStatement();
-            rs = statement.executeQuery(sql);
+            ResultSet rs = statement.executeQuery(sql);
             rs.next();
             orden = new Orden();
             orden.setIdOrden(rs.getInt("idorden"));
@@ -100,7 +107,9 @@ public class OrdenJdbcRepository {
             conexion.close();
         } catch (Exception e) {
             orden = null;
-            System.out.println("ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":getByIdOrden: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return orden;
     }
@@ -109,11 +118,10 @@ public class OrdenJdbcRepository {
         Conexion conexion = new Conexion();
         String sql = "SELECT MAX(idorden) as max FROM orden WHERE id_dependencia = " + idDependencia;
         System.out.println(sql);
-        ResultSet rs = null;
         Integer max;
         try {
             Statement statement = conexion.getConnection().createStatement();
-            rs = statement.executeQuery(sql);
+            ResultSet rs = statement.executeQuery(sql);
             rs.next();
             max = rs.getInt("max");
             rs.close();
@@ -121,7 +129,9 @@ public class OrdenJdbcRepository {
             conexion.close();
         } catch (Exception e) {
             max = 0;
-            System.out.println("ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":getMaxIdordenByDependenciaId: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return max;
     }
@@ -130,11 +140,10 @@ public class OrdenJdbcRepository {
         Conexion conexion = new Conexion();
         String sql = "SELECT MAX(idorden) as max FROM orden";
         System.out.println(sql);
-        ResultSet rs = null;
         Integer max;
         try {
             Statement statement = conexion.getConnection().createStatement();
-            rs = statement.executeQuery(sql);
+            ResultSet rs = statement.executeQuery(sql);
             rs.next();
             max = rs.getInt("max");
             rs.close();
@@ -142,7 +151,9 @@ public class OrdenJdbcRepository {
             conexion.close();
         } catch (Exception e) {
             max = 0;
-            System.out.println("ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":getMaxIdorden: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return max;
     }
@@ -151,18 +162,19 @@ public class OrdenJdbcRepository {
         Conexion conexion = new Conexion();
         String sql = "SELECT MIN(idorden) as min FROM orden WHERE id_dependencia= " + idDependencia + " AND estado='P'";
         System.out.println(sql);
-        ResultSet rs = null;
         Integer min = 0;
         try {
             Statement statement = conexion.getConnection().createStatement();
-            rs = statement.executeQuery(sql);
+            ResultSet rs = statement.executeQuery(sql);
             rs.next();
             min = rs.getInt("min");
             rs.close();
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            String mensaje = this.nombreClase + ":getMinIdorden: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return min;
     }
@@ -188,7 +200,9 @@ public class OrdenJdbcRepository {
                 totalPendientes = ordenes.size();
             }
         } catch (Exception e) {
-            System.out.println("OrdenJdbcRepository:getOneOrden:ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":totalPendientes: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return totalPendientes;
     }
@@ -212,7 +226,9 @@ public class OrdenJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            String mensaje = "OrdenJdbcRepository:insertOrden:ERROR: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
             return false;
         }
         return true;
@@ -227,7 +243,9 @@ public class OrdenJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            String mensaje = this.nombreClase + ":updateOrden: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
             return false;
         }
         return true;
@@ -243,7 +261,9 @@ public class OrdenJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            System.out.println("OrdenJdbcRepository:deleteAll:ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":deleteAll: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
             return false;
         }
         return true;

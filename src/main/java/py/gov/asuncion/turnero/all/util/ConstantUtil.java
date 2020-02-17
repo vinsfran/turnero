@@ -8,10 +8,16 @@ public interface ConstantUtil {
     String FILE_PATH = "/turnero/sonido/";
     String SERVER_IP = "126.10.10.189";
     Integer SERVER_PORT = 6666;
-    String URL_JDBC = "jdbc:postgresql://ateneadev.asuncion.gov.py:5432/sima_db?currentSchema=turnos";
+    
+    String URL_JDBC_DESA = "jdbc:postgresql://ateneadev.asuncion.gov.py:5432/sima_db?currentSchema=turnos";
+    String USER_DESA = "sima";
+    String PASWORD_DESA = "Tics2019";
+
+    String URL_JDBC_PRODU = "jdbc:postgresql://atenea.asuncion.gov.py:5432/turnero_db?currentSchema=bloquea";
+    String USER_PRODU = "turnos";
+    String PASWORD_PRODU = "wjyIHG3aRY";
+
     String DRIVER_JDBC = "org.postgresql.Driver";
-    String USER = "sima";
-    String PASWORD = "Tics2019";
     String SOLINUX = "Linux";
     String CODIGO_PATHSONIDOLINUX = "PATHSONIDOLINUX";
     String CODIGO_PATHSONIDOWIN = "PATHSONIDOWIN";

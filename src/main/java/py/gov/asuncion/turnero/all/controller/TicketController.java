@@ -14,13 +14,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class TicketController {
+public class TicketController extends LogJdbcRepository {
 
     private DependenciaJdbcRepository dependenciaJdbcRepository;
     private OrdenJdbcRepository ordenJdbcRepository;
     private OrdenHistoricoJdbcRepository ordenHistoricoJdbcRepository;
+    private String nombreClase;
 
     public TicketController() {
+        this.nombreClase = TicketController.class.getName();
         dependenciaJdbcRepository = new DependenciaJdbcRepository();
         ordenJdbcRepository = new OrdenJdbcRepository();
         ordenHistoricoJdbcRepository = new OrdenHistoricoJdbcRepository();
@@ -77,6 +79,7 @@ public class TicketController {
                     orden.setNLetra(abecedario.getIdabc());
                     orden.setAbec(abecedario.getLetra());
                 } else {
+                    insertLog(this.nombreClase + ":generarTicket: Hubo un problema al obtener el parametro MaxLetras");
                     throw new Exception("Hubo un problema al obtener el parametro MaxLetras");
                 }
             }
@@ -87,11 +90,12 @@ public class TicketController {
             orden.setFecha(new Date());
             orden.setAbreDependencia(dependencia.getAbreviatura());
             if (!ordenJdbcRepository.insertOrden(orden)) {
+                insertLog(this.nombreClase + ":generarTicket: Hubo un problema al insertar el siguiente Turno");
                 throw new Exception("Hubo un problema al insertar el siguiente Turno");
             }
             TicketModel ticketModel = new TicketModel();
             ticketModel.setDependenciaNombre(dependencia.getDescripcion());
-            ticketModel.setLetra(orden.getAbreDependencia() + orden.getAbec());
+            ticketModel.setLetra(orden.getAbreDependencia() + "-" + orden.getAbec());
             ticketModel.setNumero(orden.getNOrden());
 
             System.out.println("Ticket: " + ticketModel.toString());
@@ -104,12 +108,14 @@ public class TicketController {
                 ordenHistorico.setIdDependencia(dependencia.getIddependencia());
                 ordenHistorico.setFecha(new Date());
                 if (!ordenHistoricoJdbcRepository.insertOrdenHistorico(ordenHistorico)) {
+                    insertLog(this.nombreClase + ":generarTicket: Hubo un problema al insertar el siguiente Turno al Historico");
                     throw new Exception("Hubo un problema al insertar el siguiente Turno al Historico");
                 }
             } else {
                 throw new Exception("No se pudo imprimir el siguiente Ticket");
             }
         } else {
+            insertLog(this.nombreClase + ":generarTicket: Hubo un problema al obtener la Dependencia: " + idDependencia);
             throw new Exception("Hubo un problema al obtener la Dependencia: " + idDependencia);
         }
         return orden.getAbreDependencia() + "-" + orden.getAbec() + orden.getNOrden();

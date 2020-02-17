@@ -10,7 +10,13 @@ import java.sql.Statement;
 /**
  * @author vinsfran
  */
-public class OrdenHistoricoJdbcRepository {
+public class OrdenHistoricoJdbcRepository extends LogJdbcRepository {
+
+    private String nombreClase;
+
+    public OrdenHistoricoJdbcRepository() {
+        this.nombreClase = OrdenHistoricoJdbcRepository.class.getName();
+    }
 
     public boolean insertOrdenHistorico(OrdenHistorico ordenHistorico) {
         Conexion conexion = new Conexion();
@@ -27,7 +33,9 @@ public class OrdenHistoricoJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            System.out.println("OrdenHistoricoJdbcRepository:insertOrdenHistorico:ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":insertOrdenHistorico: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
             return false;
         }
         return true;

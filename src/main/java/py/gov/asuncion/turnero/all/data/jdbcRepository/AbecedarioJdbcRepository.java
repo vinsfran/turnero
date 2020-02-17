@@ -9,7 +9,13 @@ import py.gov.asuncion.turnero.all.data.dto.Abecedario;
  *
  * @author vinsfran
  */
-public class AbecedarioJdbcRepository {
+public class AbecedarioJdbcRepository extends LogJdbcRepository {
+
+    private String nombreClase;
+
+    public AbecedarioJdbcRepository() {
+        this.nombreClase = AbecedarioJdbcRepository.class.getName();
+    }
 
     public Abecedario getAbecedarioByIdAbecedario(Integer idabc) {
         Conexion conexion = new Conexion();
@@ -30,23 +36,10 @@ public class AbecedarioJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            String mensaje = this.nombreClase + ":getAbecedarioByIdAbecedario: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return abecedario;
     }
-
-//    public boolean updateAbecedario(Abecedario abecedario) {
-//        Conexion conexion = new Conexion();
-//        String sql = "UPDATE abecedario SET estado='A', cliente_idcliente= " + abecedario.getIdCliente() + " WHERE idabecedario = " + abecedario.getIdAbecedario();
-//        try {
-//            Statement statement = conexion.getConnection().createStatement();
-//            statement.executeUpdate(sql);
-//            statement.close();
-//            conexion.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-//        return true;
-//    }
 }

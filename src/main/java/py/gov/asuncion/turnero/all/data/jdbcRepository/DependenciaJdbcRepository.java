@@ -11,17 +11,22 @@ import java.util.List;
 /**
  * @author vinsfran
  */
-public class DependenciaJdbcRepository {
+public class DependenciaJdbcRepository extends LogJdbcRepository {
+
+    private String nombreClase;
+
+    public DependenciaJdbcRepository() {
+        this.nombreClase = DependenciaJdbcRepository.class.getName();
+    }
 
     public Dependencia getDependenciaByDescripcion(String descripcion) {
         Conexion conexion = new Conexion();
         String sql = "SELECT * FROM dependencia WHERE descripcion='" + descripcion.trim() + "'";
         System.out.println(sql);
-        ResultSet rs = null;
         Dependencia dependencia = null;
         try {
             Statement statement = conexion.getConnection().createStatement();
-            rs = statement.executeQuery(sql);
+            ResultSet rs = statement.executeQuery(sql);
             rs.next();
             dependencia = new Dependencia();
             dependencia.setIddependencia(rs.getInt("iddependencia"));
@@ -32,7 +37,9 @@ public class DependenciaJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            System.out.println("DependenciaJdbcRepository:getDependenciaByDescripcion:ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":getDependenciaByDescripcion: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return dependencia;
     }
@@ -56,7 +63,9 @@ public class DependenciaJdbcRepository {
             conexion.close();
         } catch (Exception e) {
             dependencia = null;
-            System.out.println("DependenciaJdbcRepository:getDependenciaById:ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":getDependenciaById: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return dependencia;
     }
@@ -83,7 +92,9 @@ public class DependenciaJdbcRepository {
             statement.close();
             conexion.close();
         } catch (Exception e) {
-            System.out.println("DependenciaJdbcRepository:getDependenciasByEstado:ERROR: " + e.getMessage());
+            String mensaje = this.nombreClase + ":getDependenciasByEstado: " + e.getMessage();
+            insertLog(mensaje);
+            System.out.println(mensaje);
         }
         return dependencias;
     }
